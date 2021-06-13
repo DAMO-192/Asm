@@ -1,0 +1,13 @@
+db:
+  username:
+    "root"
+  port:
+    "3306"
+  host:
+    "localhost"
+  charset:
+    "utf8"
+  passwd:
+    "root123456"
+  databases:
+    "new"
