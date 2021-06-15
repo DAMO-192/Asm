@@ -2,6 +2,7 @@ package conn
 
 import (
 	"Asm/databases"
+	"Asm/dto"
 	"Asm/moled"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
@@ -76,9 +77,19 @@ func Login(c *gin.Context) {
 		c.JSON(203, "密码错误")
 		return
 	}
-	token := "11"
+	token, e := tokenst(user)
+	if e != nil {
+		c.JSON(303, "系统异常")
+		return
+	}
+
 	c.JSON(200, gin.H{"msg": "登陆成功",
 		"token": token,
 		"data":  " ",
 	})
+
+}
+func Info(c *gin.Context) {
+	user, _ := c.Get("user")
+	c.JSON(200, gin.H{"msg": dto.ToUserDto(user.(*moled.User))})
 }
