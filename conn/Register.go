@@ -58,7 +58,7 @@ func isTelephoneExisit(db *gorm.DB, telephone string) bool {
 func Login(c *gin.Context) {
 	db := databases.InitDB()
 	telephone := c.PostForm("telephone")
-	passwd := c.PostForm("passwd")
+	passwd := c.PostForm("password")
 	if len(telephone) != 11 {
 		c.JSON(http.StatusInternalServerError, gin.H{"Msg": "手机号不为11位"})
 		return
@@ -69,9 +69,16 @@ func Login(c *gin.Context) {
 	}
 	var user moled.User
 	db.Where("telephone=?", telephone).First(&user)
-
-	err := bcrypt.CompareHashAndPassword([]byte(user.Passwd), []byte(passwd))
-	if err != nil {
-		c.JSON(203, gin.H{"msg": "密码错误"})
+	if user.ID == 0 {
+		c.JSON(203, gin.H{"msg": "用户不存在"})
 	}
+	if err := bcrypt.CompareHashAndPassword([]byte(user.Passwd), []byte(passwd)); err != nil {
+		c.JSON(203, "密码错误")
+		return
+	}
+	token := "11"
+	c.JSON(200, gin.H{"msg": "登陆成功",
+		"token": token,
+		"data":  " ",
+	})
 }
