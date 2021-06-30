@@ -28,6 +28,9 @@ func InitDB() *gorm.DB {
 		os.Exit(500)
 	}
 	var user moled.User
+	var ResourceType moled.ResourceType
+	DB.AutoMigrate(&ResourceType)
 	DB.AutoMigrate(&user)
+
 	return DB
 }
