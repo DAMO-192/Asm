@@ -8,7 +8,6 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 	"net/http"
-	"strconv"
 )
 
 func Register(c *gin.Context) {
@@ -101,14 +100,15 @@ func Info(c *gin.Context) {
 }
 func AccsessReginst(c *gin.Context) {
 	db := databases.InitDB()
-	username := c.PostForm("username")
-	networktype := c.PostForm("networktype")
-	pcytpe := c.PostForm("pctype")
-	pcmoled := c.PostForm("pcmoled")
-	ip := c.PostForm("ip")
-	disksize := c.PostForm("disksize")
-	memmorysize := c.PostForm("memmorysize")
-
+	var pcty moled.ResourceType
+	c.Bind(&pcty)
+	username := pcty.UserName
+	networktype := pcty.NetWorkType
+	pcytpe := pcty.PCType
+	pcmoled := pcty.PCModel
+	ip := pcty.Address
+	disksize := pcty.DiskSize
+	memmorysize := pcty.MemmorySize
 	if len(username) == 0 || len(networktype) == 0 || len(pcytpe) == 0 || len(pcmoled) == 0 {
 		return
 	}
@@ -121,24 +121,14 @@ func AccsessReginst(c *gin.Context) {
 		c.JSON(200, gin.H{"msg": "计算机类型只能为 台式 笔记本 云桌面"})
 		return
 	}
-	diskSize, err := strconv.ParseInt(disksize, 10, 64)
-	if err != nil {
-		c.JSON(500, gin.H{"msg": "请输入纯数字"})
-		return
-	}
-	memmorySize, err := strconv.ParseInt(memmorysize, 10, 64)
-	if err != nil {
-		c.JSON(500, gin.H{"msg": "请输入纯数字"})
-		return
-	}
 	var resourceType = moled.ResourceType{
 		UserName:    username,
 		PCModel:     pcmoled,
 		PCType:      pcytpe,
 		NetWorkType: networktype,
 		Address:     ip,
-		DiskSize:    diskSize,
-		MemmorySize: memmorySize,
+		DiskSize:    disksize,
+		MemmorySize: memmorysize,
 	}
 	db.Create(&resourceType)
 	c.JSON(200, gin.H{"msg": "资源登记成功"})
