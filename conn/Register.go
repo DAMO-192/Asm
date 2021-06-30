@@ -13,9 +13,11 @@ import (
 
 func Register(c *gin.Context) {
 	db := databases.InitDB()
-	name := c.PostForm("name")
-	telephone := c.PostForm("telephone")
-	passwd := c.PostForm("password")
+	var req moled.User
+	c.Bind(&req)
+	name := req.Name
+	telephone := req.Telephone
+	passwd := req.Passwd
 
 	if len(name) == 0 {
 		c.JSON(200, gin.H{"Msg": "请输入用户名"})
@@ -59,23 +61,26 @@ func isTelephoneExisit(db *gorm.DB, telephone string) bool {
 }
 func Login(c *gin.Context) {
 	db := databases.InitDB()
-	telephone := c.PostForm("telephone")
-	passwd := c.PostForm("password")
+	var req = moled.User{}
+	c.Bind(&req)
+	telephone := req.Telephone
+	passwd := req.Passwd
 	if len(telephone) != 11 {
-		c.JSON(http.StatusInternalServerError, gin.H{"Msg": "手机号不为11位"})
+		c.JSON(204, gin.H{"Msg": "手机号不为11位"})
 		return
 	}
 	if len(passwd) < 6 {
-		c.JSON(http.StatusInternalServerError, gin.H{"Msg": "密码长度不足"})
+		c.JSON(204, gin.H{"Msg": "密码长度不足"})
 		return
 	}
 	var user moled.User
 	db.Where("telephone=?", telephone).First(&user)
 	if user.ID == 0 {
-		c.JSON(203, gin.H{"msg": "用户不存在"})
+		c.JSON(203, gin.H{"Msg": "用户不存在，或密码错误"})
+		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Passwd), []byte(passwd)); err != nil {
-		c.JSON(203, "密码错误")
+		c.JSON(203, gin.H{"Msg": "密码错误，用户不从在"})
 		return
 	}
 	token, e := tokenst(user)
@@ -84,7 +89,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{"msg": "登陆成功",
+	c.JSON(200, gin.H{"Msg": "登陆成功",
 		"token": token,
 		"data":  " ",
 	})
@@ -143,6 +148,8 @@ func Accsessinfo(c *gin.Context) {
 	var resoucetype []moled.ResourceType
 	//var resourceType moled.ResourceType
 	db.Find(&resoucetype)
-	c.JSON(200, gin.H{"msg": resoucetype})
-
+	//c.JSON(200, gin.H{"用户":resoucetype[4],"网络类型":resoucetype[5],"电脑类型":resoucetype[6],"电脑型号":resoucetype[7],"IP地址":resoucetype[8],
+	//	"内存大小":resoucetype[9],"硬盘大小":resoucetype[10],
+	//	})
+	c.JSON(200, resoucetype)
 }
