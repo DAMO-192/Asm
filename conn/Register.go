@@ -13,21 +13,23 @@ import (
 func Register(c *gin.Context) {
 	db := databases.InitDB()
 	var req moled.User
-	c.Bind(&req)
-	name := req.Name
-	telephone := req.Telephone
-	passwd := req.Passwd
+	name := c.PostForm("name")
+	telephone := c.PostForm("telephone")
+	//name:=req.Name
+	//telephone := req.Telephone
+	c.ShouldBind(&req)
+	passwd := c.PostForm("passwd")
 
 	if len(name) == 0 {
-		c.JSON(200, gin.H{"Msg": "请输入用户名"})
+		c.JSON(http.StatusOK, gin.H{"Msg": "请输入用户名"})
 		return
 	}
 	if len(telephone) != 11 {
-		c.JSON(http.StatusInternalServerError, gin.H{"Msg": "手机号不为11位"})
+		c.JSON(http.StatusOK, gin.H{"Msg": "手机号不为11位"})
 		return
 	}
-	if len(passwd) > 6 {
-		c.JSON(http.StatusInternalServerError, gin.H{"Msg": "密码长度不足"})
+	if len(passwd) < 6 {
+		c.JSON(http.StatusOK, gin.H{"Msg": "密码长度不足"})
 		return
 	}
 	pwd, err := bcrypt.GenerateFromPassword([]byte(passwd), bcrypt.DefaultCost)
@@ -36,7 +38,7 @@ func Register(c *gin.Context) {
 		return
 	}
 	if isTelephoneExisit(db, telephone) {
-		c.JSON(203, gin.H{"msg": "账号以存在"})
+		c.JSON(200, gin.H{"msg": "账号以存在"})
 		return
 	}
 	var user = moled.User{
@@ -52,7 +54,7 @@ func Register(c *gin.Context) {
 }
 func isTelephoneExisit(db *gorm.DB, telephone string) bool {
 	var user moled.User
-	db.Where("telephone = ?", telephone).First(&user)
+	_ = db.Where("telephone = ?", telephone).First(&user)
 	if user.ID != 0 {
 		return true
 	}
@@ -75,11 +77,11 @@ func Login(c *gin.Context) {
 	var user moled.User
 	db.Where("telephone=?", telephone).First(&user)
 	if user.ID == 0 {
-		c.JSON(203, gin.H{"Msg": "用户不存在，或密码错误"})
+		c.JSON(203, gin.H{"Msg": "密码错误"})
 		return
 	}
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Passwd), []byte(passwd)); err != nil {
-		c.JSON(203, gin.H{"Msg": "密码错误，用户不从在"})
+		c.JSON(203, gin.H{"Msg": "密码错误"})
 		return
 	}
 	token, e := tokenst(user)
@@ -110,6 +112,15 @@ func AccsessReginst(c *gin.Context) {
 	disksize := pcty.DiskSize
 	memmorysize := pcty.MemmorySize
 	if len(username) == 0 || len(networktype) == 0 || len(pcytpe) == 0 || len(pcmoled) == 0 {
+		c.JSON(200, gin.H{
+			"user_name":     "",
+			"net_work_type": "",
+			"pc_type":       "",
+			"pc_model":      "",
+			"address":       "",
+			"MSG":           "请根据相关类型填写",
+		})
+
 		return
 	}
 	if networktype != "WAN" && networktype != "LAN" {
@@ -138,8 +149,8 @@ func Accsessinfo(c *gin.Context) {
 	var resoucetype []moled.ResourceType
 	//var resourceType moled.ResourceType
 	db.Find(&resoucetype)
-	//c.JSON(200, gin.H{"用户":resoucetype[4],"网络类型":resoucetype[5],"电脑类型":resoucetype[6],"电脑型号":resoucetype[7],"IP地址":resoucetype[8],
-	//	"内存大小":resoucetype[9],"硬盘大小":resoucetype[10],
-	//	})
+	//c.JSON(200, gin.H{"用户": resoucetype[4], "网络类型": resoucetype[5], "电脑类型": resoucetype[6], "电脑型号": resoucetype[7], "IP地址": resoucetype[8],
+	//	"内存大小": resoucetype[9], "硬盘大小": resoucetype[10],
+	//})
 	c.JSON(200, resoucetype)
 }

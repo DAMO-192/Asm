@@ -8,6 +8,6 @@ db:
   charset:
     "utf8"
   passwd:
-    "root123456"
+    "Root123456"
   databases:
     "new"
