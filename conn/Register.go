@@ -112,15 +112,6 @@ func AccsessReginst(c *gin.Context) {
 	disksize := pcty.DiskSize
 	memmorysize := pcty.MemmorySize
 	if len(username) == 0 || len(networktype) == 0 || len(pcytpe) == 0 || len(pcmoled) == 0 {
-		c.JSON(200, gin.H{
-			"user_name":     "",
-			"net_work_type": "",
-			"pc_type":       "",
-			"pc_model":      "",
-			"address":       "",
-			"MSG":           "请根据相关类型填写",
-		})
-
 		return
 	}
 	if networktype != "WAN" && networktype != "LAN" {
@@ -149,8 +140,8 @@ func Accsessinfo(c *gin.Context) {
 	var resoucetype []moled.ResourceType
 	//var resourceType moled.ResourceType
 	db.Find(&resoucetype)
-	//c.JSON(200, gin.H{"用户": resoucetype[4], "网络类型": resoucetype[5], "电脑类型": resoucetype[6], "电脑型号": resoucetype[7], "IP地址": resoucetype[8],
-	//	"内存大小": resoucetype[9], "硬盘大小": resoucetype[10],
-	//})
+	c.JSON(200, gin.H{"用户": resoucetype[4], "网络类型": resoucetype[5], "电脑类型": resoucetype[6], "电脑型号": resoucetype[7], "IP地址": resoucetype[8],
+		"内存大小": resoucetype[9], "硬盘大小": resoucetype[10],
+	})
 	c.JSON(200, resoucetype)
 }
