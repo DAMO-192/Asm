@@ -19,5 +19,7 @@ func main() {
 	working := e.Group("/api/working")
 	working.POST("/register", middleware.AuthMiddleware(), conn.AccsessReginst)
 	working.GET("/info", middleware.AuthMiddleware(), conn.Accsessinfo)
+	working.POST("/Personnel",middleware.AuthMiddleware(),conn.PersonnelRegistration)
+	working.POST("/getPermission",middleware.AuthMiddleware(),conn.GetPermission)
 	e.Run(":80")
 }

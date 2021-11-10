@@ -100,48 +100,57 @@ func Info(c *gin.Context) {
 	user, _ := c.Get("user")
 	c.JSON(200, gin.H{"msg": dto.ToUserDto(user.(*moled.User))})
 }
-func AccsessReginst(c *gin.Context) {
-	db := databases.InitDB()
-	var pcty moled.ResourceType
-	c.Bind(&pcty)
-	username := pcty.UserName
-	networktype := pcty.NetWorkType
-	pcytpe := pcty.PCType
-	pcmoled := pcty.PCModel
-	ip := pcty.Address
-	disksize := pcty.DiskSize
-	memmorysize := pcty.MemmorySize
-	if len(username) == 0 || len(networktype) == 0 || len(pcytpe) == 0 || len(pcmoled) == 0 {
-		return
-	}
-	if networktype != "WAN" && networktype != "LAN" {
-
-		c.JSON(200, gin.H{"msg": "网络类型只能为LAN或者WAN", "c": networktype})
-		return
-	}
-	if pcytpe != "台式" && pcytpe != "笔记本" && pcytpe != "云桌面" {
-		c.JSON(200, gin.H{"msg": "计算机类型只能为 台式 笔记本 云桌面"})
-		return
-	}
-	var resourceType = moled.ResourceType{
-		UserName:    username,
-		PCModel:     pcmoled,
-		PCType:      pcytpe,
-		NetWorkType: networktype,
-		Address:     ip,
-		DiskSize:    disksize,
-		MemmorySize: memmorysize,
-	}
-	db.Create(&resourceType)
-	c.JSON(200, gin.H{"msg": "资源登记成功"})
-}
-func Accsessinfo(c *gin.Context) {
-	db := databases.InitDB()
-	var resoucetype []moled.ResourceType
-	//var resourceType moled.ResourceType
-	db.Find(&resoucetype)
-	c.JSON(200, gin.H{"用户": resoucetype[4], "网络类型": resoucetype[5], "电脑类型": resoucetype[6], "电脑型号": resoucetype[7], "IP地址": resoucetype[8],
-		"内存大小": resoucetype[9], "硬盘大小": resoucetype[10],
-	})
-	c.JSON(200, resoucetype)
-}
+//func AccsessReginst(c *gin.Context) {
+//	db := databases.InitDB()
+//	var pcty moled.ResourceType
+//	c.Bind(&pcty)
+//	username := pcty.UserName
+//	networktype := pcty.NetWorkType
+//	pcytpe := pcty.PCType
+//	pcmoled := pcty.PCModel
+//	ip := pcty.Address
+//	disksize := pcty.DiskSize
+//	memmorysize := pcty.MemmorySize
+//	if len(username) == 0 || len(networktype) == 0 || len(pcytpe) == 0 || len(pcmoled) == 0 {
+//		c.JSON(200, gin.H{
+//			"user_name":     "",
+//			"net_work_type": "",
+//			"pc_type":       "",
+//			"pc_model":      "",
+//			"address":       "",
+//			"MSG":           "请根据相关类型填写",
+//		})
+//
+//		return
+//	}
+//	if networktype != "WAN" && networktype != "LAN" {
+//
+//		c.JSON(200, gin.H{"msg": "网络类型只能为LAN或者WAN", "c": networktype})
+//		return
+//	}
+//	if pcytpe != "台式" && pcytpe != "笔记本" && pcytpe != "云桌面" {
+//		c.JSON(200, gin.H{"msg": "计算机类型只能为 台式 笔记本 云桌面"})
+//		return
+//	}
+//	var resourceType = moled.ResourceType{
+//		UserName:    username,
+//		PCModel:     pcmoled,
+//		PCType:      pcytpe,
+//		NetWorkType: networktype,
+//		Address:     ip,
+//		DiskSize:    disksize,
+//		MemmorySize: memmorysize,
+//	}
+//	db.Create(&resourceType)
+//	c.JSON(200, gin.H{"msg": "资源登记成功"})
+//}
+//func Accsessinfo(c *gin.Context) {
+//	db := databases.InitDB()
+//	var resoucetype []moled.ResourceType
+//	//var resourceType moled.ResourceType
+//	db.Find(&resoucetype)
+//	//c.JSON(200, gin.H{"用户": resoucetype[4], "网络类型": resoucetype[5], "电脑类型": resoucetype[6], "电脑型号": resoucetype[7], "IP地址": resoucetype[8],
+//	//	"内存大小": resoucetype[9], "硬盘大小": resoucetype[10],
+//	//})
+//	c.JSON(200, resoucetype)
+//}
