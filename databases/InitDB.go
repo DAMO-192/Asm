@@ -29,8 +29,10 @@ func InitDB() *gorm.DB {
 	}
 	var user moled.User
 	var ResourceType moled.ResourceType
+	var Menulist moled.Menulist
 	DB.AutoMigrate(&ResourceType)
 	DB.AutoMigrate(&user)
+	DB.AutoMigrate(&Menulist)
 
 	return DB
 }

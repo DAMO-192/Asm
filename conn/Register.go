@@ -13,13 +13,15 @@ import (
 func Register(c *gin.Context) {
 	db := databases.InitDB()
 	var req moled.User
-	name := c.PostForm("name")
-	telephone := c.PostForm("telephone")
-	//name:=req.Name
+	//name := c.PostForm("name")
+	//telephone := c.PostForm("telephone")
+	////name:=req.Name
 	//telephone := req.Telephone
-	c.ShouldBind(&req)
-	passwd := c.PostForm("passwd")
-
+	c.BindJSON(&req)
+	//passwd := c.PostForm("passwd")
+	name := req.Name
+	telephone := req.Telephone
+	passwd := req.Passwd
 	if len(name) == 0 {
 		c.JSON(http.StatusOK, gin.H{"Msg": "请输入用户名"})
 		return
@@ -63,7 +65,7 @@ func isTelephoneExisit(db *gorm.DB, telephone string) bool {
 func Login(c *gin.Context) {
 	db := databases.InitDB()
 	var req = moled.User{}
-	c.Bind(&req)
+	c.BindJSON(&req)
 	telephone := req.Telephone
 	passwd := req.Passwd
 	if len(telephone) != 11 {
@@ -91,8 +93,9 @@ func Login(c *gin.Context) {
 	}
 
 	c.JSON(200, gin.H{"Msg": "登陆成功",
-		"token": token,
-		"data":  " ",
+		"token":  token,
+		"data":   " ",
+		"status": 200,
 	})
 
 }
@@ -100,6 +103,14 @@ func Info(c *gin.Context) {
 	user, _ := c.Get("user")
 	c.JSON(200, gin.H{"msg": dto.ToUserDto(user.(*moled.User))})
 }
+func MenuList(c *gin.Context) {
+	db := databases.InitDB()
+	var menulist []moled.Menulist
+	db.Find(&menulist)
+	c.JSON(200, menulist)
+
+}
+
 //func AccsessReginst(c *gin.Context) {
 //	db := databases.InitDB()
 //	var pcty moled.ResourceType
